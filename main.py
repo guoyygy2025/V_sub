@@ -7,9 +7,9 @@ from datetime import datetime
 
 # --- 配置区：在此添加你的订阅链接或单节点 ---
 SOURCES = [
-    "https://raw.githubusercontent.com/free-nodes/nodes/main/sub", # 示例订阅1
-    "https://example.com/another_sub",                             # 示例订阅2
-    "vmess://xxxxxx",                                              # 示例单节点
+    "https://raw.githubusercontent.com/peasoft/NoMoreWalls/master/list.txt", # 示例订阅1
+    "https://raw.githubusercontent.com/WLget/V2Ray_configs_64/refs/heads/master/ConfigSub_list.txt",                             # 示例订阅2
+    "https://github.com/ermaozi/get_subscribe/blob/main/subscribe/v2ray.txt",                                              # 示例单节点
 ]
 
 TIMEOUT = 3       # 测速超时时间（秒），超过此时间认为不可用
