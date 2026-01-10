@@ -10,7 +10,7 @@ SOURCES = [
     "https://raw.githubusercontent.com/peasoft/NoMoreWalls/master/list.txt", # 示例订阅1
     "https://raw.githubusercontent.com/WLget/V2Ray_configs_64/refs/heads/master/ConfigSub_list.txt",                             # 示例订阅2
     "https://github.com/ermaozi/get_subscribe/blob/main/subscribe/v2ray.txt",                                              # 示例单节点
-    “https://github.com/free18/v2ray/blob/main/v.txt”,
+    "https://github.com/free18/v2ray/blob/main/v.txt",
     "https://gist.githubusercontent.com/shuaidaoya/9e5cf2749c0ce79932dd9229d9b4162b/raw/base64.txt"
 ]
 
