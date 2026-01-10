@@ -2,8 +2,9 @@ name: 6-Hour Node Update
 
 on:
   schedule:
-    - cron: '0 */6 * * *' # 每 6 小时触发一次 (UTC 0, 6, 12, 18)
-  workflow_dispatch:
+    # 对应北京时间：08:00, 12:00, 16:00, 20:00, 00:00
+    - cron: '0 0,4,8,12,16 * * *'
+  workflow_dispatch: # 保持手动触发，方便测试
 
 jobs:
   build:
