@@ -1,40 +1,35 @@
-name: 2-Hour Node Update
+name: Auto Update
 
 on:
   schedule:
-    # 对应北京时间：08:00, 12:00, 16:00, 20:00, 00:00
-    - cron: '0 0,4,8,12,16 * * *'
-  workflow_dispatch: # 保持手动触发，方便测试
+    - cron: '0 22 * * *' # 每天北京时间早上 6 点运行
+  workflow_dispatch: # 允许手动点击按钮运行
 
 permissions:
   contents: write
 
 jobs:
-  build:
+  run_script:
     runs-on: ubuntu-latest
-    
     steps:
-    - name: Checkout Code
-      uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.10'
-        cache: 'pip'
+      - name: Python Setup
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
 
-    - name: Install Dependencies
-      run: |
-        pip install -r requirements.txt
+      - name: Install
+        run: pip install -r requirements.txt
 
-    - name: Run Script
-      run: python main.py
+      - name: Execute
+        run: python main.py
 
-    - name: Commit and Push
-      run: |
-        git config --local user.email "github-actions[bot]@users.noreply.github.com"
-        git config --local user.name "github-actions[bot]"
-        git add subscribe.txt subscribe_plain.txt
-        # 如果没有变化，不报错
-        git commit -m "🚀 Auto-update: $(date -u)" || echo "No changes to commit"
-        git push
+      - name: Push
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add subscribe.txt
+          git commit -m "Update nodes" || exit 0
+          git push
