@@ -2,7 +2,7 @@ name: Update Subscribe
 
 on:
   schedule:
-    - cron: '0 22 * * *' # 每天北京时间早上6点运行
+    - cron: '0 22 * * *'
   workflow_dispatch:
 
 permissions:
@@ -16,10 +16,18 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.10'
+      
       - name: Install Dependencies
         run: pip install -r requirements.txt
+
+      - name: Download GeoIP Database
+        run: |
+          # 从公共源下载离线 IP 数据库 (GeoLite2-Country)
+          wget -O Country.mmdb https://github.com/P3TERX/GeoLite.mmdb/raw/download/GeoLite2-Country.mmdb
+
       - name: Run Script
         run: python main.py
+
       - name: Commit and Push
         run: |
           git config --local user.email "actions@github.com"
