@@ -18,19 +18,20 @@ CONFIG = {
         "https://raw.githubusercontent.com/vfarid/v2ray-worker-sub/master/Single",
         "https://raw.githubusercontent.com/v2ray-free/v2ray/master/v2ray",
         "https://raw.githubusercontent.com/peasoft/NoMoreWalls/master/list.txt", 
-        "https://raw.githubusercontent.com/WLget/V2Ray_configs_64/refs/heads/master/ConfigSub_list.txt",                           
-        "https://raw.githubusercontent.com/ermaozi/get_subscribe/refs/heads/main/subscribe/v2ray.txt",                                            
+        "https://raw.githubusercontent.com/WLget/V2Ray_configs_64/refs/heads/master/ConfigSub_list.txt",
+        "https://raw.githubusercontent.com/ermaozi/get_subscribe/refs/heads/main/subscribe/v2ray.txt",
         "https://raw.githubusercontent.com/free18/v2ray/refs/heads/main/v.txt",
         "https://gist.githubusercontent.com/shuaidaoya/9e5cf2749c0ce79932dd9229d9b4162b/raw/base64.txt"
     ],
-    "global_dns": "1.1.1.1",      # Cloudflare DNS: 用于 GitHub 环境极速解析
-    "china_dns": "223.5.5.5",     # 阿里 DNS: 用于模拟国内解析环境，过滤污染节点
-    "timeout": 0.4,               # 测速超时
-    "max_workers": 80             # 并发数
+    # 目标国家：仅保留美国、香港、日本
+    "target_countries": ["US", "HK", "JP"],
+    "global_dns": "1.1.1.1",
+    "china_dns": "223.5.5.5",
+    "timeout": 5.0,
+    "max_workers": 80
 }
 
 def safe_decode(data: str) -> str:
-    """标准 Base64 解码"""
     if not data: return ""
     data = re.sub(r'[^A-Za-z0-9+/=]', '', data.replace("-", "+").replace("_", "/"))
     missing_padding = len(data) % 4
@@ -39,16 +40,20 @@ def safe_decode(data: str) -> str:
         return base64.b64decode(data).decode("utf-8", errors="ignore")
     except: return ""
 
-def get_resolver(nameserver: str):
-    """配置 DNS 解析器"""
-    resolver = dns.resolver.Resolver()
-    resolver.nameservers = [nameserver]
-    resolver.timeout = 2.0
-    resolver.lifetime = 2.0
-    return resolver
+def get_ip_country(ip):
+    """请求 IP 地理位置 API"""
+    try:
+        # 使用 ip-api.com 获取国家代码
+        response = requests.get(f"http://ip-api.com/json/{ip}?fields=status,countryCode", timeout=2)
+        data = response.json()
+        if data.get("status") == "success":
+            return data.get("countryCode")
+    except:
+        pass
+    return None
 
 def test_node(link: str):
-    """双重 DNS 校验 + TCP 测速"""
+    """DNS 解析 -> 地理位置校验 -> TCP 测速"""
     try:
         host, port = None, None
         if link.startswith("vmess://"):
@@ -60,21 +65,27 @@ def test_node(link: str):
         
         if not host or not port: return None
 
-        # 如果是 IP 则直接测试，如果是域名则进行双重解析
+        # 1. DNS 解析逻辑
         if not re.match(r"^\d{1,3}(\.\d{1,3}){3}$", host):
-            # 1. 阿里 DNS 校验 (检查国内解析是否正常)
+            # 阿里 DNS 预检国内可达性
             try:
-                get_resolver(CONFIG["china_dns"]).resolve(host, 'A')
-            except:
-                return None # 阿里解析失败，说明国内大概率不可用
+                res_ali = dns.resolver.Resolver(); res_ali.nameservers = [CONFIG['china_dns']]
+                res_ali.timeout = 2; res_ali.resolve(host, 'A')
+            except: return None
 
-            # 2. 1.1.1.1 获取解析后的实际 IP
-            answers = get_resolver(CONFIG["global_dns"]).resolve(host, 'A')
-            ip_to_test = str(answers[0])
+            # 1.1.1.1 真实解析
+            res_cf = dns.resolver.Resolver(); res_cf.nameservers = [CONFIG['global_dns']]
+            res_cf.timeout = 2
+            ip_to_test = str(res_cf.resolve(host, 'A')[0])
         else:
             ip_to_test = host
 
-        # 3. TCP 握手测速
+        # 2. 地理位置二次筛选
+        country = get_ip_country(ip_to_test)
+        if country not in CONFIG["target_countries"]:
+            return None
+
+        # 3. 实际 TCP 测速
         start = time.perf_counter()
         with socket.create_connection((ip_to_test, port), timeout=CONFIG["timeout"]):
             latency = (time.perf_counter() - start) * 1000
@@ -83,23 +94,20 @@ def test_node(link: str):
         return None
 
 def main():
-    print(f"🚀 启动测速优化方案: 1.1.1.1 (海外解析) + {CONFIG['china_dns']} (国内校验)")
+    print(f"🚀 任务启动 | 目标地区: {CONFIG['target_countries']}")
     raw_all = []
-    
     with requests.Session() as s:
-        s.headers.update({"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"})
+        s.headers.update({"User-Agent": "Mozilla/5.0"})
         for url in CONFIG["sources"]:
             try:
-                r = s.get(url, timeout=15)
+                r = s.get(url, timeout=10)
                 content = r.text
                 if "://" not in content[:100]: content = safe_decode(content)
-                found = re.findall(r'(?:vmess|vless|ss|ssr|trojan)://[^\s|<>"]+', content)
-                raw_all.extend(found)
-                print(f"✅ 源 {url[:25]}... 提取到 {len(found)} 个节点")
+                raw_all.extend(re.findall(r'(?:vmess|vless|ss|ssr|trojan)://[^\s|<>"]+', content))
             except: pass
 
     unique_nodes = list(dict.fromkeys(raw_all))
-    print(f"💎 待测节点总数: {len(unique_nodes)}，开始验证...")
+    print(f"💎 提取到去重节点: {len(unique_nodes)}，开始地理位置过滤与测速...")
 
     valid_list = []
     with concurrent.futures.ThreadPoolExecutor(max_workers=CONFIG["max_workers"]) as executor:
@@ -110,15 +118,12 @@ def main():
     valid_list.sort(key=lambda x: x[1])
     final_nodes = [item[0] for item in valid_list]
 
-    # 保底输出（如果全部不通，保留前5个原始节点）
-    if not final_nodes: final_nodes = unique_nodes[:5]
-
-    # 结果转为 Base64 写入文件
+    # 导出为 Base64 订阅格式
     out_b64 = base64.b64encode("\n".join(final_nodes).encode()).decode()
     with open("subscribe.txt", "w", encoding="utf-8") as f:
         f.write(out_b64)
     
-    print(f"🎉 任务完成！最终保留有效节点: {len(final_nodes)} 个")
+    print(f"🎉 任务完成！保留 {len(final_nodes)} 个符合要求的节点 (US/HK/JP)")
 
 if __name__ == "__main__":
     main()
