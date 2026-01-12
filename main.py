@@ -16,8 +16,12 @@ CONFIG = {
     "sources": [
         "https://raw.githubusercontent.com/freefq/free/master/v2",
         "https://raw.githubusercontent.com/vfarid/v2ray-worker-sub/master/Single",
-        "https://raw.githubusercontent.com/peasoft/NoMoreWalls/master/list.txt",
-        "https://raw.githubusercontent.com/v2ray-free/v2ray/master/v2ray"
+        "https://raw.githubusercontent.com/v2ray-free/v2ray/master/v2ray",
+        "https://raw.githubusercontent.com/peasoft/NoMoreWalls/master/list.txt", 
+        "https://raw.githubusercontent.com/WLget/V2Ray_configs_64/refs/heads/master/ConfigSub_list.txt",                           
+        "https://raw.githubusercontent.com/ermaozi/get_subscribe/refs/heads/main/subscribe/v2ray.txt",                                            
+        "https://raw.githubusercontent.com/free18/v2ray/refs/heads/main/v.txt",
+        "https://gist.githubusercontent.com/shuaidaoya/9e5cf2749c0ce79932dd9229d9b4162b/raw/base64.txt"
     ],
     "global_dns": "1.1.1.1",      # Cloudflare DNS: 用于 GitHub 环境极速解析
     "china_dns": "223.5.5.5",     # 阿里 DNS: 用于模拟国内解析环境，过滤污染节点
