@@ -24,9 +24,9 @@ CONFIG = {
     "mmdb_path": "Country.mmdb", # 离线数据库路径
     "global_dns": "1.1.1.1",
     "china_dns": "223.5.5.5",
-    "timeout": 5.0,
+    "timeout": 0.4,
     "max_workers": 100, # 离线查询极快，可以大幅提高并发
-    "max_node_count": 500
+    "max_node_count": 100
 }
 
 # 扩展国家对照表
