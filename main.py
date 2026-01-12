@@ -21,7 +21,7 @@ CONFIG = {
     ],
     "global_dns": "1.1.1.1",      # Cloudflare DNS: 用于 GitHub 环境极速解析
     "china_dns": "223.5.5.5",     # 阿里 DNS: 用于模拟国内解析环境，过滤污染节点
-    "timeout": 1,               # 测速超时
+    "timeout": 0.4,               # 测速超时
     "max_workers": 80             # 并发数
 }
 
