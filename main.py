@@ -14,9 +14,6 @@ from urllib.parse import urlparse
 # --- 核心配置 ---
 CONFIG = {
     "sources": [
-        "https://raw.githubusercontent.com/freefq/free/master/v2",
-        "https://raw.githubusercontent.com/vfarid/v2ray-worker-sub/master/Single",
-        "https://raw.githubusercontent.com/v2ray-free/v2ray/master/v2ray",
         "https://raw.githubusercontent.com/peasoft/NoMoreWalls/master/list.txt", 
         "https://raw.githubusercontent.com/WLget/V2Ray_configs_64/refs/heads/master/ConfigSub_list.txt",
         "https://raw.githubusercontent.com/ermaozi/get_subscribe/refs/heads/main/subscribe/v2ray.txt",
