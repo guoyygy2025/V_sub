@@ -1,35 +1,29 @@
-name: Auto Update
+name: Update Subscribe
 
 on:
   schedule:
-    - cron: '0 22 * * *' # 每天北京时间早上 6 点运行
-  workflow_dispatch: # 允许手动点击按钮运行
+    - cron: '0 22 * * *' # 每天北京时间早上6点运行
+  workflow_dispatch:
 
 permissions:
   contents: write
 
 jobs:
-  run_script:
+  run-script:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Python Setup
-        uses: actions/setup-python@v5
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: '3.10'
-
-      - name: Install
+      - name: Install Dependencies
         run: pip install -r requirements.txt
-
-      - name: Execute
+      - name: Run Script
         run: python main.py
-
-      - name: Push
+      - name: Commit and Push
         run: |
-          git config --local user.email "action@github.com"
+          git config --local user.email "actions@github.com"
           git config --local user.name "GitHub Action"
           git add subscribe.txt
-          git commit -m "Update nodes" || exit 0
+          git commit -m "Update nodes $(date)" || exit 0
           git push
