@@ -2,7 +2,7 @@ name: Update Subscribe
 
 on:
   schedule:
-    - cron: '0 22 * * *'
+    - cron: '0 22,0,2,4,6,8,10,12,14 * * *'
   workflow_dispatch:
 
 permissions:
