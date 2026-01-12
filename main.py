@@ -16,8 +16,8 @@ SOURCES = [
 
 # 阿里 DNS 地址 (用于模拟国内环境解析)
 ALI_DNS = "223.5.5.5"
-TIMEOUT = 3       # 测速超时
-MAX_WORKERS = 50  # 并发数
+TIMEOUT = 0.4       # 测速超时
+MAX_WORKERS = 80  # 并发数
 
 def decode_base64(data):
     data = data.replace('-', '+').replace('_', '/')
