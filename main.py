@@ -22,7 +22,7 @@ CONFIG = {
     ],
     "global_dns": "1.1.1.1",
     "china_dns": "223.5.5.5",
-    "timeout": 5.0,
+    "timeout": 1.0,
     "max_workers": 100,
     "max_node_count": 500  # 核心修改：仅保留延迟最低的前 500 个节点
 }
