@@ -37,6 +37,25 @@ COUNTRY_NAMES = {
     "TR": "土耳其", "BR": "巴西", "TH": "泰国", "VN": "越南", "MY": "马来西亚"
 }
 
+def parse_to_singbox(link, tag):
+    """简单解析逻辑：将分享链接转为 sing-box 格式"""
+    try:
+        if link.startswith("trojan://"):
+            part1 = link.split("://")[1]
+            password, rest = part1.split("@")
+            server_port = rest.split("?")[0].split("#")[0]
+            server, port = server_port.split(":")
+            return {
+                "type": "trojan",
+                "tag": tag,
+                "server": server,
+                "server_port": int(port),
+                "password": password,
+                "tls": {"enabled": True, "insecure": True}
+            }
+        # 这里可以扩展 vmess/ss 的解析逻辑
+    except: return None
+
 def safe_decode(data: str) -> str:
     if not data: return ""
     data = re.sub(r'[^A-Za-z0-9+/=]', '', data.replace("-", "+").replace("_", "/"))
@@ -131,7 +150,7 @@ def main():
     out_b64 = base64.b64encode("\n".join(final_nodes).encode()).decode()
     with open("subscribe.txt", "w", encoding="utf-8") as f:
         f.write(out_b64)
-    
+    with open("nodes.json", "w") as f: json.dump(valid_outbounds, f)
     print(f"🎉 离线验证完成！共精选 {len(final_nodes)} 个节点。")
 
 if __name__ == "__main__":
