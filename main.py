@@ -24,8 +24,8 @@ CONFIG = {
     "mmdb_path": "Country.mmdb",
     "global_dns": "1.1.1.1",
     "timeout": 0.5,
-    "max_workers": 200,
-    "max_node_count": 200
+    "max_workers": 100,
+    "max_node_count": 100
 }
 
 COUNTRY_NAMES = {
